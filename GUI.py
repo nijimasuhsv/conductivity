@@ -6,7 +6,6 @@ import pytz
 import glob
 import datetime
 import numpy as np
-from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
