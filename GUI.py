@@ -8,6 +8,7 @@ import datetime
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 ######################################################################
 # tkinter import
@@ -81,7 +82,7 @@ def SegJudge(digit,binimg):
 
 	return num
 
-def ImgRecognition(binimg):
+def ImgRecognition(binimg,path):
 	thousand = np.array([[6,4,10,2],[6,19,10,2],[6,34,10,2],[4,6,2,13],[4,21,2,13],[16,6,2,13],[16,21,2,13]])
 	hundred = np.array([[26,4,10,2],[26,19,10,2],[26,34,10,2],[24,6,2,13],[24,21,2,13],[36,6,2,13],[36,21,2,13]])
 	ten = np.array([[46,4,10,2],[46,19,10,2],[46,34,10,2],[44,6,2,13],[44,21,2,13],[56,6,2,13],[56,21,2,13]])
@@ -95,35 +96,50 @@ def ImgRecognition(binimg):
 	try:
 		recvalue = value[0] * 1000 + value[1] * 100 + value[2] *10 + value[3]
 	except TypeError:
-		print(path + ' is unreadable')
+		text1.insert(tk.END,path + ' is unreadable\n')
 		return 0
 
 	return recvalue
 
 def main():
-	paths = glob.glob('c:/Users/Kenta.M/Desktop/python/image/*')
+	now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+	text1.insert(tk.END,'[{0:%Y/%m/%d %H:%M:%S}] start Reading\n'.format(now))
+	
+	if not imgdir.get():
+		text1.insert(tk.END,'Please choose your input dir\n')
+		return
+	elif not outputpath.get():
+		text1.insert(tk.END,'Please choose your output dir\n')
+		return
 
-	cutrange = np.array([[129, 133], [196, 133], [126, 157], [194, 156]])
+	if not tl_x.get() or tl_y.get() or tr_x.get() or tr_y.get() or bl_x.get() or bl_y.get() or br_x.get() or br_y.get():
+		text1.insert(tk.END,'Please enter all coordinates\n')
+		return
+
+	inputpaths = imgdir.get() + '/*'
+	outputpaths = outputpath.get() + '/output_{0:%Y%m%d%H%M%S}.csv'
+
+	paths = glob.glob(inputpaths)
+
+	cutrange = np.array([[tl_x.get(), tl_y.get()], [tr_x.get(), tr_y.get()], [bl_x.get(), bl_y.get()], [br_x.get(), br_y.get()]])
 
 	output = []
 ###
 	for path in paths:
 		binimg = Binarization(path,cutrange)
 
-		ans = ImgRecognition(binimg)
+		ans = ImgRecognition(binimg,path)
 
 		output.append([ans])
 
-		print('-',end='')
+		text1.insert(tk.END,'-')
 ###
 
-	now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
-
-	with open('c:/Users/Kenta.M/Desktop/python/output_csv/output_{0:%Y%m%d%H%M%S}.csv'.format(now),'w', newline="") as f:
+	with open(outputpaths.format(now),'w', newline='') as f:
 		writer = csv.writer(f)
 		writer.writerows(output)
 
-	print('Done.')
+	text1.insert(tk.END,'Done.\n')
 
 ######################################################################
 # tkinter define
@@ -133,33 +149,22 @@ def SelectFile():
 	dirpath = tk.filedialog.askdirectory(initialdir = iDir)
 	imgdir.set(dirpath)
 
+def SelectOFile():
+	iDir = os.path.abspath(os.path.dirname(__file__))
+	dirpath = tk.filedialog.askdirectory(initialdir = iDir)
+	outputpath.set(dirpath)
 
 def DrawBinImage():
 	dirpaths = imgdir.get() + '/*'
 	print(dirpaths)
 	#RangeCheck(dirpaths)
 
-def GetXYCoordinates():
-	XY = []
-	XY[0] = tl_x.get()
-	XY[1] = tl_y.get()
-	XY[2] = tr_x.get()
-	XY[3] = tr_y.get()
-	XY[4] = bl_x.get()
-	XY[5] = bl_y.get()
-	XY[6] = br_x.get()
-	XY[7] = br_y.get()
-	
-	
-
-
 ######################################################################
 # tkinter main
 
-
 root = tk.Tk()
 root.title('Recognizing digits Program')
-root.geometry('500x400')
+root.geometry('500x600')
 root.resizable(0,0)
 
 main1 = tk.LabelFrame(root,bd=2,text='1.Image Path')
@@ -167,10 +172,12 @@ main2 = tk.Frame(root)
 main3 = tk.LabelFrame(root,bd=2,text='2.XY coordinates')
 main4 = tk.LabelFrame(root,bd=2,text='3.Binarization test')
 main5 = tk.LabelFrame(root,bd=2,text='4.Recognizing digits')
+main6 = tk.Frame(root,bd=2)
 
 button1 = ttk.Button(main1,text='Brows',command=SelectFile)
 button2 = ttk.Button(main4,text='Draw',command=DrawBinImage,width=20)
 button3 = ttk.Button(main5,text='Read',command=main,width=20)
+button4 = ttk.Button(main1,text='Brows',command=SelectOFile)
 
 label1 = ttk.Label(main3,text='Top left :')
 label2 = ttk.Label(main3,text='Top right :')
@@ -188,11 +195,15 @@ label13 = ttk.Label(main3,text=')')
 label14 = ttk.Label(main3,text=')')
 label15 = ttk.Label(main3,text=')')
 label16 = ttk.Label(main3,text=')')
-
-label17 = ttk.Label(main2,text='test')
+label17 = ttk.Label(main1,text='input  :')
+label18 = ttk.Label(main1,text='output :')
 
 imgdir = tk.StringVar()
 imgdir_entry = ttk.Entry(main1, textvariable=imgdir, width=50)
+imgdir_entry.insert(tk.END,'C:/Users/Kenta.M/Desktop/python/image')
+outputpath = tk.StringVar()
+outputpath_entry = ttk.Entry(main1, textvariable=outputpath, width=50)
+outputpath_entry.insert(tk.END,'C:/Users/Kenta.M/Desktop/python/output_csv')
 tl_x = tk.StringVar()
 tl_x_entry = ttk.Entry(main3,textvariable=tl_x,width=5)
 tl_y = tk.StringVar()
@@ -209,19 +220,33 @@ br_x = tk.StringVar()
 br_x_entry = ttk.Entry(main3,textvariable=br_x,width=5)
 br_y = tk.StringVar()
 br_y_entry = ttk.Entry(main3,textvariable=br_y,width=5)
+tl_x_entry.insert(tk.END,'129')
+tl_y_entry.insert(tk.END,'133')
+tr_x_entry.insert(tk.END,'196')
+tr_y_entry.insert(tk.END,'133')
+bl_x_entry.insert(tk.END,'126')
+bl_y_entry.insert(tk.END,'157')
+br_x_entry.insert(tk.END,'194')
+br_y_entry.insert(tk.END,'156')
+
+text1 = tk.Text(main6, width=63, height=7,bd=5)
+
+scrollbar = tk.Scrollbar(main6, command=text1.yview)
 
 root.grid_columnconfigure((0,1), weight=1)
 root.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)
 
-main1.grid(row=0,column=0,columnspan=2,padx=10,pady=10,sticky="nsew")
-main2.grid(row=1,column=0,columnspan=2,rowspan=2,padx=10,pady=10,sticky="nsew")
-main3.grid(row=3,column=0,rowspan=2,padx=10,pady=10,sticky="nsew")
-main4.grid(row=3,column=1,padx=10,pady=10,sticky="nsew")
-main5.grid(row=4,column=1,padx=10,pady=10,sticky="nsew")
+main1.grid(row=0,column=0,columnspan=2,padx=10,pady=10,sticky='nsew')
+main2.grid(row=1,column=0,columnspan=2,rowspan=2,padx=10,pady=10,sticky='nsew')
+main3.grid(row=3,column=0,rowspan=2,padx=10,pady=10,sticky='nsew')
+main4.grid(row=3,column=1,padx=10,pady=10,sticky='nsew')
+main5.grid(row=4,column=1,padx=10,pady=10,sticky='nsew')
+main6.grid(row=5,column=0,columnspan=2,padx=10,pady=10,sticky='nsew')
 
 button1.grid(row=0,column=2)
 button2.grid(row=0,column=0,padx=10,pady=10)
 button3.grid(row=0,column=0,padx=10,pady=10)
+button4.grid(row=1,column=2)
 
 label1.grid(row=0,column=0)
 label2.grid(row=1,column=0)
@@ -239,10 +264,11 @@ label13.grid(row=0,column=5)
 label14.grid(row=1,column=5)
 label15.grid(row=2,column=5)
 label16.grid(row=3,column=5)
-
 label17.grid(row=0,column=0)
+label18.grid(row=1,column=0)
 
 imgdir_entry.grid(row=0, column=1)
+outputpath_entry.grid(row=1, column=1)
 tl_x_entry.grid(row=0,column=2)
 tl_y_entry.grid(row=0,column=4)
 tr_x_entry.grid(row=1,column=2)
@@ -251,5 +277,10 @@ bl_x_entry.grid(row=2,column=2)
 bl_y_entry.grid(row=2,column=4)
 br_x_entry.grid(row=3,column=2)
 br_y_entry.grid(row=3,column=4)
+
+scrollbar.grid(row=0,column=1,sticky='ns')
+
+text1.grid(row=0,column=0)
+text1.config(yscrollcommand=scrollbar.set)
 
 root.mainloop()
