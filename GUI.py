@@ -176,6 +176,14 @@ def MakeGraphs():
 	ax0.imshow(testbinimg0, cmap='gray')
 	ax1.imshow(testbinimg1, cmap='gray')
 	
+	ax0.axvline(20, color = 'red')
+	ax0.axvline(40, color = 'red')
+	ax0.axvline(60, color = 'red')
+
+	ax1.axvline(20, color = 'red')
+	ax1.axvline(40, color = 'red')
+	ax1.axvline(60, color = 'red')
+	
 	ax0.add_patch(r1)
 	ax0.add_patch(r2)
 	ax0.add_patch(r3)
@@ -254,7 +262,7 @@ def SelectOFile():
 
 root = tk.Tk()
 root.title('Recognizing digits Program')
-root.geometry('1000x800')
+root.geometry('900x550')
 root.resizable(0,0)
 
 main1 = tk.LabelFrame(root,bd=2,text='1.Image Path')
@@ -319,13 +327,13 @@ bl_y_entry.insert(tk.END,'157')
 br_x_entry.insert(tk.END,'194')
 br_y_entry.insert(tk.END,'156')
 
-text1 = tk.Text(main6, width=63, height=7,bd=5)
+text1 = tk.Text(main6, width=60, height=7,bd=5)
 
 scrollbar = tk.Scrollbar(main6, command=text1.yview)
 
-fig = plt.figure(figsize=(6, 4))
-ax0 = fig.add_subplot(1,2,1)
-ax1 = fig.add_subplot(1,2,2)
+fig = plt.figure(figsize=(4, 5))
+ax0 = fig.add_subplot(2,1,1)
+ax1 = fig.add_subplot(2,1,2)
 canvas = FigureCanvasTkAgg(fig, master=main2)
 
 r1 = Rectangle(xy=(5,4),width=10,height=2,ec='blue',fill=False)
@@ -385,15 +393,15 @@ r55 = Rectangle(xy=(63,21),width=2,height=13,ec='blue',fill=False)
 r56 = Rectangle(xy=(75,6),width=2,height=13,ec='blue',fill=False)
 r57 = Rectangle(xy=(75,21),width=2,height=13,ec='blue',fill=False)
 
-root.grid_columnconfigure((0,1), weight=1)
-root.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)
+root.grid_columnconfigure((0,1,2), weight=1)
+root.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
-main1.grid(row=0,column=0,columnspan=2,padx=10,pady=10,sticky='nsew')
-main2.grid(row=1,column=0,columnspan=2,rowspan=2,padx=10,pady=10,sticky='nsew')
-main3.grid(row=3,column=0,rowspan=2,padx=10,pady=10,sticky='nsew')
-main4.grid(row=3,column=1,padx=10,pady=10,sticky='nsew')
-main5.grid(row=4,column=1,padx=10,pady=10,sticky='nsew')
-main6.grid(row=5,column=0,columnspan=2,padx=10,pady=10,sticky='nsew')
+main1.grid(row=0,column=1,columnspan=2,padx=10,pady=10,sticky='nsew')
+main2.grid(row=0,column=0,rowspan=4,padx=10,pady=10,sticky='nsew')
+main3.grid(row=1,column=1,rowspan=2,padx=10,pady=10,sticky='nsew')
+main4.grid(row=1,column=2,padx=10,pady=10,sticky='nsew')
+main5.grid(row=2,column=2,padx=10,pady=10,sticky='nsew')
+main6.grid(row=3,column=1,columnspan=2,padx=10,pady=10,sticky='nsew')
 
 button1.grid(row=0,column=2)
 button2.grid(row=0,column=0,padx=10,pady=10)
@@ -435,7 +443,10 @@ scrollbar.grid(row=0,column=1,sticky='ns')
 text1.grid(row=0,column=0)
 text1.config(yscrollcommand=scrollbar.set)
 
-canvas.get_tk_widget().grid(row=0,column=0,sticky='nsew')
+canvas.get_tk_widget().grid(row=0,column=0)
+
+starttime = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+text1.insert(tk.END,'[{0:%Y/%m/%d %H:%M:%S}] system startup\n'.format(starttime))
 
 MakeGraphs()
 
