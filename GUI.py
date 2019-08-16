@@ -9,6 +9,7 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 ######################################################################
 # tkinter import
@@ -112,7 +113,7 @@ def main():
 		text1.insert(tk.END,'Please choose your output dir\n')
 		return
 
-	if not tl_x.get() or tl_y.get() or tr_x.get() or tr_y.get() or bl_x.get() or bl_y.get() or br_x.get() or br_y.get():
+	if not tl_x.get() or not tl_y.get() or not tr_x.get() or not tr_y.get() or not bl_x.get() or not bl_y.get() or not br_x.get() or not br_y.get():
 		text1.insert(tk.END,'Please enter all coordinates\n')
 		return
 
@@ -142,6 +143,100 @@ def main():
 	text1.insert(tk.END,'Done.\n')
 
 ######################################################################
+# binarization test
+
+def MakeGraphs():
+	now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+	text1.insert(tk.END,'[{0:%Y/%m/%d %H:%M:%S}] test Drawing\n'.format(now))
+	
+	if not imgdir.get():
+		text1.insert(tk.END,'Please choose your input dir\n')
+		return
+
+	if not tl_x.get() or not tl_y.get() or not tr_x.get() or not tr_y.get() or not bl_x.get() or not bl_y.get() or not br_x.get() or not br_y.get():
+		text1.insert(tk.END,'Please enter all coordinates\n')
+		return
+
+	inputpaths = imgdir.get() + '/*'
+
+	paths = glob.glob(inputpaths)
+
+	cutrange = []
+	cutrange = np.array([[tl_x.get(), tl_y.get()], [tr_x.get(), tr_y.get()], [bl_x.get(), bl_y.get()], [br_x.get(), br_y.get()]])
+
+	num = len(paths)
+	lists = [paths[0],paths[int(num) - 1]]
+
+	testbinimg0 = Binarization(lists[0],cutrange)
+	testbinimg1 = Binarization(lists[1],cutrange)
+
+	ax0.cla()
+	ax1.cla()
+
+	ax0.imshow(testbinimg0, cmap='gray')
+	ax1.imshow(testbinimg1, cmap='gray')
+	
+	ax0.add_patch(r1)
+	ax0.add_patch(r2)
+	ax0.add_patch(r3)
+	ax0.add_patch(r4)
+	ax0.add_patch(r5)
+	ax0.add_patch(r6)
+	ax0.add_patch(r7)
+	ax0.add_patch(r8)
+	ax0.add_patch(r9)
+	ax0.add_patch(r10)
+	ax0.add_patch(r11)
+	ax0.add_patch(r12)
+	ax0.add_patch(r13)
+	ax0.add_patch(r14)
+	ax0.add_patch(r15)
+	ax0.add_patch(r16)
+	ax0.add_patch(r17)
+	ax0.add_patch(r18)
+	ax0.add_patch(r19)
+	ax0.add_patch(r20)
+	ax0.add_patch(r21)
+	ax0.add_patch(r22)
+	ax0.add_patch(r23)
+	ax0.add_patch(r24)
+	ax0.add_patch(r25)
+	ax0.add_patch(r26)
+	ax0.add_patch(r27)
+	ax0.add_patch(r28)
+
+	ax1.add_patch(r30)
+	ax1.add_patch(r31)
+	ax1.add_patch(r32)
+	ax1.add_patch(r33)
+	ax1.add_patch(r34)
+	ax1.add_patch(r35)
+	ax1.add_patch(r36)
+	ax1.add_patch(r37)
+	ax1.add_patch(r38)
+	ax1.add_patch(r39)
+	ax1.add_patch(r40)
+	ax1.add_patch(r41)
+	ax1.add_patch(r42)
+	ax1.add_patch(r43)
+	ax1.add_patch(r44)
+	ax1.add_patch(r45)
+	ax1.add_patch(r46)
+	ax1.add_patch(r47)
+	ax1.add_patch(r48)
+	ax1.add_patch(r49)
+	ax1.add_patch(r50)
+	ax1.add_patch(r51)
+	ax1.add_patch(r52)
+	ax1.add_patch(r53)
+	ax1.add_patch(r54)
+	ax1.add_patch(r55)
+	ax1.add_patch(r56)
+	ax1.add_patch(r57)
+
+	canvas.draw()
+
+######################################################################
 # tkinter define
 
 def SelectFile():
@@ -154,17 +249,12 @@ def SelectOFile():
 	dirpath = tk.filedialog.askdirectory(initialdir = iDir)
 	outputpath.set(dirpath)
 
-def DrawBinImage():
-	dirpaths = imgdir.get() + '/*'
-	print(dirpaths)
-	#RangeCheck(dirpaths)
-
 ######################################################################
 # tkinter main
 
 root = tk.Tk()
 root.title('Recognizing digits Program')
-root.geometry('500x600')
+root.geometry('1000x800')
 root.resizable(0,0)
 
 main1 = tk.LabelFrame(root,bd=2,text='1.Image Path')
@@ -175,7 +265,7 @@ main5 = tk.LabelFrame(root,bd=2,text='4.Recognizing digits')
 main6 = tk.Frame(root,bd=2)
 
 button1 = ttk.Button(main1,text='Brows',command=SelectFile)
-button2 = ttk.Button(main4,text='Draw',command=DrawBinImage,width=20)
+button2 = ttk.Button(main4,text='Draw',command=MakeGraphs,width=20)
 button3 = ttk.Button(main5,text='Read',command=main,width=20)
 button4 = ttk.Button(main1,text='Brows',command=SelectOFile)
 
@@ -233,6 +323,68 @@ text1 = tk.Text(main6, width=63, height=7,bd=5)
 
 scrollbar = tk.Scrollbar(main6, command=text1.yview)
 
+fig = plt.figure(figsize=(6, 4))
+ax0 = fig.add_subplot(1,2,1)
+ax1 = fig.add_subplot(1,2,2)
+canvas = FigureCanvasTkAgg(fig, master=main2)
+
+r1 = Rectangle(xy=(5,4),width=10,height=2,ec='blue',fill=False)
+r2 = Rectangle(xy=(25,4),width=10,height=2,ec='blue',fill=False)
+r3 = Rectangle(xy=(45,4),width=10,height=2,ec='blue',fill=False)
+r4 = Rectangle(xy=(65,4),width=10,height=2,ec='blue',fill=False)
+r5 = Rectangle(xy=(5,19),width=10,height=2,ec='blue',fill=False)
+r6 = Rectangle(xy=(25,19),width=10,height=2,ec='blue',fill=False)
+r7 = Rectangle(xy=(45,19),width=10,height=2,ec='blue',fill=False)
+r8 = Rectangle(xy=(65,19),width=10,height=2,ec='blue',fill=False)
+r9 = Rectangle(xy=(5,34),width=10,height=2,ec='blue',fill=False)
+r10 = Rectangle(xy=(25,34),width=10,height=2,ec='blue',fill=False)
+r11 = Rectangle(xy=(45,34),width=10,height=2,ec='blue',fill=False)
+r12 = Rectangle(xy=(65,34),width=10,height=2,ec='blue',fill=False)
+r13 = Rectangle(xy=(3,6),width=2,height=13,ec='blue',fill=False)
+r14 = Rectangle(xy=(3,21),width=2,height=13,ec='blue',fill=False)
+r15 = Rectangle(xy=(15,6),width=2,height=13,ec='blue',fill=False)
+r16 = Rectangle(xy=(15,21),width=2,height=13,ec='blue',fill=False)
+r17 = Rectangle(xy=(23,6),width=2,height=13,ec='blue',fill=False)
+r18 = Rectangle(xy=(23,21),width=2,height=13,ec='blue',fill=False)
+r19 = Rectangle(xy=(35,6),width=2,height=13,ec='blue',fill=False)
+r20 = Rectangle(xy=(35,21),width=2,height=13,ec='blue',fill=False)
+r21 = Rectangle(xy=(43,6),width=2,height=13,ec='blue',fill=False)
+r22 = Rectangle(xy=(43,21),width=2,height=13,ec='blue',fill=False)
+r23 = Rectangle(xy=(55,6),width=2,height=13,ec='blue',fill=False)
+r24 = Rectangle(xy=(55,21),width=2,height=13,ec='blue',fill=False)
+r25 = Rectangle(xy=(63,6),width=2,height=13,ec='blue',fill=False)
+r26 = Rectangle(xy=(63,21),width=2,height=13,ec='blue',fill=False)
+r27 = Rectangle(xy=(75,6),width=2,height=13,ec='blue',fill=False)
+r28 = Rectangle(xy=(75,21),width=2,height=13,ec='blue',fill=False)
+r30 = Rectangle(xy=(5,4),width=10,height=2,ec='blue',fill=False)
+r31 = Rectangle(xy=(25,4),width=10,height=2,ec='blue',fill=False)
+r32 = Rectangle(xy=(45,4),width=10,height=2,ec='blue',fill=False)
+r33 = Rectangle(xy=(65,4),width=10,height=2,ec='blue',fill=False)
+r34 = Rectangle(xy=(5,19),width=10,height=2,ec='blue',fill=False)
+r35 = Rectangle(xy=(25,19),width=10,height=2,ec='blue',fill=False)
+r36 = Rectangle(xy=(45,19),width=10,height=2,ec='blue',fill=False)
+r37 = Rectangle(xy=(65,19),width=10,height=2,ec='blue',fill=False)
+r38 = Rectangle(xy=(5,34),width=10,height=2,ec='blue',fill=False)
+r39 = Rectangle(xy=(25,34),width=10,height=2,ec='blue',fill=False)
+r40 = Rectangle(xy=(45,34),width=10,height=2,ec='blue',fill=False)
+r41 = Rectangle(xy=(65,34),width=10,height=2,ec='blue',fill=False)
+r42 = Rectangle(xy=(3,6),width=2,height=13,ec='blue',fill=False)
+r43 = Rectangle(xy=(3,21),width=2,height=13,ec='blue',fill=False)
+r44 = Rectangle(xy=(15,6),width=2,height=13,ec='blue',fill=False)
+r45 = Rectangle(xy=(15,21),width=2,height=13,ec='blue',fill=False)
+r46 = Rectangle(xy=(23,6),width=2,height=13,ec='blue',fill=False)
+r47 = Rectangle(xy=(23,21),width=2,height=13,ec='blue',fill=False)
+r48 = Rectangle(xy=(35,6),width=2,height=13,ec='blue',fill=False)
+r49 = Rectangle(xy=(35,21),width=2,height=13,ec='blue',fill=False)
+r50 = Rectangle(xy=(43,6),width=2,height=13,ec='blue',fill=False)
+r51 = Rectangle(xy=(43,21),width=2,height=13,ec='blue',fill=False)
+r52 = Rectangle(xy=(55,6),width=2,height=13,ec='blue',fill=False)
+r53 = Rectangle(xy=(55,21),width=2,height=13,ec='blue',fill=False)
+r54 = Rectangle(xy=(63,6),width=2,height=13,ec='blue',fill=False)
+r55 = Rectangle(xy=(63,21),width=2,height=13,ec='blue',fill=False)
+r56 = Rectangle(xy=(75,6),width=2,height=13,ec='blue',fill=False)
+r57 = Rectangle(xy=(75,21),width=2,height=13,ec='blue',fill=False)
+
 root.grid_columnconfigure((0,1), weight=1)
 root.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)
 
@@ -282,5 +434,9 @@ scrollbar.grid(row=0,column=1,sticky='ns')
 
 text1.grid(row=0,column=0)
 text1.config(yscrollcommand=scrollbar.set)
+
+canvas.get_tk_widget().grid(row=0,column=0,sticky='nsew')
+
+MakeGraphs()
 
 root.mainloop()
