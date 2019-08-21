@@ -447,6 +447,4 @@ canvas.get_tk_widget().grid(row=0,column=0)
 starttime = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
 text1.insert(tk.END,'[{0:%Y/%m/%d %H:%M:%S}] system startup\n'.format(starttime))
 
-MakeGraphs()
-
 root.mainloop()
